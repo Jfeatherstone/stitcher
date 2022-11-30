@@ -9,7 +9,7 @@ def filterBackground(img, tolerance=.05):
     editedImg[np.sqrt(np.sum((img - backgroundColor)**2, axis=-1)) < tolerance*np.max(img),:] = 0
     return editedImg
 
-def equalizeSpatialGradients(img, debug=False):
+def equalizeSpatialGradients(img, strength=.5, debug=False):
     horizontalGrad = np.array([np.median(img[:,i,:], axis=0) for i in range(img.shape[1])])
     verticalGrad = np.array([np.median(img[i,:,:], axis=0) for i in range(img.shape[0])])
 
@@ -18,7 +18,7 @@ def equalizeSpatialGradients(img, debug=False):
 
     corr = np.transpose([np.add.outer(horizontalCorr[:,i].T, verticalCorr[:,i].T) for i in range(3)])
 
-    corrImg = img - corr
+    corrImg = img - corr*strength
     corrImg = (corrImg - np.min(corrImg))
     corrImg /= np.max(corrImg)
 
@@ -49,3 +49,20 @@ def equalizeSpatialGradients(img, debug=False):
         plt.show()
 
     return corrImg
+
+def cropToContent(img, returnCorner=True):
+    gray = np.mean(img, axis=-1)
+    verticalBins = np.where(np.sum(gray, axis=0) > 0)
+    if len(verticalBins[0]) > 0:
+        leftBound, rightBound = verticalBins[0][0], verticalBins[0][-1]
+    else:
+        raise img
+
+    horizontalBins = np.where(np.sum(gray, axis=1) > 0)
+    if len(horizontalBins[0]) > 0:
+        topBound, bottomBound = horizontalBins[0][0], horizontalBins[0][-1]
+    else:
+        raise img
+
+    croppedImg = np.array(img)[topBound:bottomBound, leftBound:rightBound]
+    return (croppedImg, (leftBound, topBound)) if returnCorner else croppedImg
