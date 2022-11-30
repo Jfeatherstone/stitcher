@@ -1,4 +1,5 @@
 import cv2 as cv
+import numpy as np
 
 from .megapix_scaler import MegapixDownscaler
 from .stitching_error import StitchingError
@@ -29,13 +30,29 @@ class ImageHandler:
         self.final_scaler = MegapixDownscaler(final_megapix)
 
         self.scales_set = False
+        self.use_names = False
         self.img_names = []
+        self.imgs = []
         self.img_sizes = []
 
     def set_img_names(self, img_names):
         if len(img_names) < 2:
             raise StitchingError("2 or more Images needed for Stitching")
+        self.use_names = [True]*len(img_names)
         self.img_names = img_names
+
+    def set_imgs(self, imgs):
+        if len(imgs) < 2:
+            raise StitchingError("2 or more Images needed for Stitching")
+
+        self.use_names = [type(img) is np.str_ or type(img) is str for img in imgs]
+        self.img_names = [None]*len(imgs)
+        self.imgs = [None]*len(imgs)
+
+        for i in range(len(imgs)):
+            self.img_names[i] = imgs[i] if self.use_names[i] else hash(str(imgs[i]))
+            self.imgs[i] = self.read_image(imgs[i])
+
 
     def resize_to_medium_resolution(self):
         return self.read_and_resize_imgs(self.medium_scaler)
@@ -63,8 +80,7 @@ class ImageHandler:
 
     def input_images(self):
         self.img_sizes = []
-        for name in self.img_names:
-            img = self.read_image(name)
+        for img in self.imgs:
             size = self.get_image_size(img)
             self.img_sizes.append(size)
             self.set_scaler_scales()
@@ -76,8 +92,13 @@ class ImageHandler:
         return (img.shape[1], img.shape[0])
 
     @staticmethod
-    def read_image(img_name):
-        img = cv.imread(img_name)
+    def read_image(input_image):
+
+        if type(input_image) is np.str_ or type(input_image) is str:
+            img = cv.imread(input_image)
+        else:
+            img = input_image
+
         if img is None:
             raise StitchingError("Cannot read image " + img_name)
         return img
