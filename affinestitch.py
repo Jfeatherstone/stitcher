@@ -185,6 +185,6 @@ def affineStitch(imagePath, ):
     Image.fromarray(stitchedImage).save('stitch_result.png')
 
 if __name__ == '__main__':
-    imagePath = '/home/jack/Videos/test/'
+    imagePath = '/bucket/DaniU/Members/Jack Featherstone/Test/map_2_images/'
 
     affineStitch(imagePath)
