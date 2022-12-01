@@ -59,6 +59,7 @@ class FeatureDetector:
             f = cv.detail.computeImageFeatures2(self.detector, np.array(img, dtype=np.uint8), *args, **kwargs)
             features["keypoints"] = f.keypoints
             features["descriptors"] = f.descriptors
+            return f
 
         return features
 

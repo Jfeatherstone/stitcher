@@ -4,6 +4,7 @@ from .feature_matcher import *
 from .feature_detector import *
 from .blender import *
 from .image_handler import ImageHandler
+from .seam_finder import *
 
 from .video import *
 from .convolution import *
