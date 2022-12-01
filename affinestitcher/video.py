@@ -6,6 +6,23 @@ import tqdm
 
 from scipy.fft import fft2
 
+def getVideoFrames(videoPath):
+    cam = cv2.VideoCapture(videoPath)
+
+    frames = []
+
+    while(True):
+        ret, frame = cam.read()
+
+        if ret:
+            frames.append(frame)
+
+        else:
+            break
+
+    return frames
+
+
 def identifyStableImages(images, derThreshold=.2, fftQuantile=.80, minSeqLen=2, differenceTol=.05, debug=False, bar=True):
     """
     Given a list of images (as read from a video) identify which ones are not
@@ -18,7 +35,7 @@ def identifyStableImages(images, derThreshold=.2, fftQuantile=.80, minSeqLen=2, 
     else:
         imgArr = images
         
-    for i in tqdm.tqdm(range(len(blurArr))):# if bar else range(len(blurArr)):
+    for i in tqdm.tqdm(range(len(blurArr)), desc='Identifying stable images'):# if bar else range(len(blurArr)):
         # Grayscale
         img = np.mean(imgArr[i], axis=-1)
         # FFT
