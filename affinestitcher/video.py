@@ -15,7 +15,7 @@ def getVideoFrames(videoPath):
         ret, frame = cam.read()
 
         if ret:
-            frames.append(frame)
+            frames.append(frame.astype(np.uint8))
 
         else:
             break
@@ -23,7 +23,7 @@ def getVideoFrames(videoPath):
     return frames
 
 
-def identifyStableImages(images, derThreshold=.2, fftQuantile=.80, minSeqLen=2, differenceTol=.05, debug=False, bar=True):
+def identifyStableImages(images, derThreshold=.1, fftQuantile=.80, minSeqLen=2, differenceTol=.05, debug=False, bar=True):
     """
     Given a list of images (as read from a video) identify which ones are not
     blurry, and therefore suitable to be stitched together.
